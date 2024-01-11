@@ -17,7 +17,7 @@ class FaceLandmarkManager:
         """
         self._face_detector = dlib.get_frontal_face_detector()
         predictor_path = 'tracking_system' + os.sep + 'shape_predictor_68_face_landmarks.dat'
-        self._face_predictor = dlib.shape_predictor(predictor_path)
+        self._face_predictor = dlib.shape_predictor('gaze_cv/tracking_system/shape_predictor_68_face_landmarks.dat')
 
         # 顔のランドマークリストの初期化
         self._face_landmark_list = []
