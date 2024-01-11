@@ -7,7 +7,9 @@ from tracking_system import EyeSystemManager
 from scipy.spatial import distance
 import numpy as np
 import serial
+import time
 
+#シリアル通信の設定
 Ser = serial.Serial('COM12',9600,timeout=3)
 
 def Serialsend(serial_send_data):
@@ -40,7 +42,9 @@ def get_iris_from_cam(cam_no):
 
     # カメラ画像の表示('q'で終了)
     while True:
-        ret, img = cap.read()
+        for i in range(100):
+            ret, img = cap.read()
+            
 
         # 顔のランドマークリストを取得
         face_manager.clear_face_landmark_list()
@@ -74,7 +78,9 @@ def get_iris_from_cam(cam_no):
         status_string[6] = "右目x-"+str(status[6])
         
         print(status_string)
-
+        
+        
+        #シリアル通信の送信部
         Serialsend(str(status))
 
         # 結果の表示
@@ -83,6 +89,8 @@ def get_iris_from_cam(cam_no):
         # 'q'が入力されるまでカメラ画像を表示し続ける
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        
+        time.sleep(0.1)
 
     # 後処理
     cap.release()
