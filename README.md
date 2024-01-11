@@ -1,3 +1,9 @@
+# Shiwasuが作ったわけではありません
+
+https://github.com/33taro/gaze_cv
+大元はこちら
+
+
 # 虹彩検出システム
 pythonによるOpenCVとdlibを利用した虹彩検出システムです。
 
