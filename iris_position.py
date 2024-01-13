@@ -10,7 +10,7 @@ import serial
 import time
 
 #シリアル通信の設定
-Ser = serial.Serial('COM12',9600,timeout=3)
+#Ser = serial.Serial('COM12',9600,timeout=3)
 
 def Serialsend(serial_send_data):
     Ser.write(serial_send_data.encode())
@@ -42,7 +42,7 @@ def get_iris_from_cam(cam_no):
 
     # カメラ画像の表示('q'で終了)
     while True:
-        for i in range(100):
+        for i in range(10):
             ret, img = cap.read()
             
 
@@ -50,38 +50,42 @@ def get_iris_from_cam(cam_no):
         face_manager.clear_face_landmark_list()
         face_manager.detect_face_landmark(img)
         face_landmark_list = face_manager.get_face_landmark_list()
-
-        eye_potision_status = get_eye_status(face_landmark_list,img)
-        eye_mouse_open_status = judge(face_landmark_list)
-        status = np.append(eye_mouse_open_status,eye_potision_status)
         
-        status_string = ['a','a','a','a','a','a','a']
+        status_string = ['0','0','0','0','0','0','0']
         
-        if(status[0] == 1):
-            status_string[0] = "左目-開"
-        else:
-            status_string[0] = "左目-閉"
+        if face_landmark_list:
+            eye_potision_status = get_eye_status(face_landmark_list,img)
+            eye_mouse_open_status = judge(face_landmark_list)
+            status = np.append(eye_mouse_open_status,eye_potision_status)
+            
+            if(status[0] == 1):
+                status_string[0] = "左目-開"
+            else:
+                status_string[0] = "左目-閉"
         
-        if(status[1] == 1):
-            status_string[1] = "右目-開"
-        else:
-            status_string[1] = "左目-閉"
+            if(status[1] == 1):
+                status_string[1] = "右目-開"
+            else:
+                status_string[1] = "左目-閉"
         
-        if(status[2] == 1):
-            status_string[2] = "口-開"
-        else:
-            status_string[2] = "口-閉"
+            if(status[2] == 1):
+                status_string[2] = "口-開"
+            else:
+                status_string[2] = "口-閉"
         
-        status_string[3] = "左目x-"+str(status[3])
-        status_string[4] = "左目y-"+str(status[4])
-        status_string[5] = "右目x-"+str(status[5])
-        status_string[6] = "右目x-"+str(status[6])
+            status_string[3] = "左目x-"+str(status[3])
+            status_string[4] = "左目y-"+str(status[4])
+            status_string[5] = "右目x-"+str(status[5])
+            status_string[6] = "右目x-"+str(status[6])
+        
+        
+        
         
         print(status_string)
         
         
         #シリアル通信の送信部
-        Serialsend(str(status))
+        #Serialsend(str(status))
 
         # 結果の表示
         cv2.imshow('readme_img', img)
@@ -196,18 +200,18 @@ def judge(face_parts):
     #    (10, 140), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     # 目の開閉の判別
-    if left_eye_ear > 0.3:
+    if left_eye_ear > 0.05:
         eye_l = 1
     else:
         eye_l = 0
         
-    if right_eye_ear > 0.3:
+    if right_eye_ear > 0.05:
         eye_r = 1
     else:
         eye_r = 0
     
     # 口の開閉の判別
-    if mouse_size > 0.4:
+    if mouse_size > 0.1:
         mouse_open = 1
     else:
         mouse_open = 0
