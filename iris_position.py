@@ -51,32 +51,46 @@ def get_iris_from_cam(cam_no):
         face_manager.detect_face_landmark(img)
         face_landmark_list = face_manager.get_face_landmark_list()
         
-        status_string = ['0','0','0','0','0','0','0']
+        status_string = [None]*7
+        
+        cv2.circle(img, (75, 125), 70, (0, 0, 0), thickness=3)
         
         if face_landmark_list:
             eye_potision_status = get_eye_status(face_landmark_list,img)
             eye_mouse_open_status = judge(face_landmark_list)
             status = np.append(eye_mouse_open_status,eye_potision_status)
             
+            
+            
             if(status[0] == 1):
                 status_string[0] = "左目-開"
+                cv2.circle(img, (100, 100), 10, (0, 255, 0), thickness=-1)
+                cv2.arrowedLine(img, (100, 100), (int(100+50*status[3]), int(100+50*status[4])), (255, 0, 0), thickness=4)
             else:
                 status_string[0] = "左目-閉"
+                cv2.line(img, (90, 100), (110, 100), (0, 0, 255),thickness=3)
         
             if(status[1] == 1):
                 status_string[1] = "右目-開"
+                cv2.circle(img, (50, 100), 10, (0, 255, 0), thickness=-1)
+                cv2.arrowedLine(img, (50, 100), (int(50+50*status[5]), int(100+50*status[6])), (255, 0, 0), thickness=4)
             else:
                 status_string[1] = "左目-閉"
+                cv2.line(img, (40, 100), (60, 100), (0, 0, 255),thickness=3)
         
             if(status[2] == 1):
                 status_string[2] = "口-開"
+                cv2.circle(img, (75, 150), 10, (0, 255, 0), thickness=-1)
             else:
                 status_string[2] = "口-閉"
+                cv2.line(img, (65, 150), (85, 150), (0, 0, 255),thickness=3)
         
             status_string[3] = "左目x-"+str(status[3])
             status_string[4] = "左目y-"+str(status[4])
             status_string[5] = "右目x-"+str(status[5])
             status_string[6] = "右目x-"+str(status[6])
+        else:
+            cv2.putText(img, 'Put your face in the Window',(0, 50),cv2.FONT_HERSHEY_PLAIN, 2,(255, 0, 0), 5,cv2.LINE_AA)
         
         
         
@@ -145,9 +159,9 @@ def get_eye_status(landmark_list,image):
         lange_leftY = (bottom_leftY_coordinates - top_leftY_coordinates)/2
         position_leftY = (center_leftY_coordinates -middle_leftY)/lange_leftY
           #右目
-        center_rightY_coordinates = left_iris['center'][1]
-        top_rightY_coordinates = face_landmark[37][1]
-        bottom_rightY_coordinates = face_landmark[41][1]
+        center_rightY_coordinates = right_iris['center'][1]
+        top_rightY_coordinates = face_landmark[38][1]
+        bottom_rightY_coordinates = face_landmark[40][1]
         middle_rightY = (top_rightY_coordinates + bottom_rightY_coordinates)/2
         lange_rightY = (bottom_rightY_coordinates - top_rightY_coordinates)/2
         position_rightY = (center_rightY_coordinates -middle_rightY)/lange_rightY
