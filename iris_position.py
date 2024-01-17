@@ -10,7 +10,7 @@ import serial
 import time
 
 #シリアル通信の設定
-#Ser = serial.Serial('COM12',9600,timeout=3)
+Ser = serial.Serial('COM3',9600,timeout=3)
 
 def Serialsend(serial_send_data):
     Ser.write(serial_send_data.encode())
@@ -89,17 +89,31 @@ def get_iris_from_cam(cam_no):
             status_string[4] = "左目y-"+str(status[4])
             status_string[5] = "右目x-"+str(status[5])
             status_string[6] = "右目x-"+str(status[6])
+            
+            degrees = [None]*5
+            
+            degrees[3] = (status[3]*status[0]+status[4]*status[1])
+            degrees[4] = (status[5]*status[0]+status[6]*status[1])
+            
+            if status[0]==1 or status[1]==1:
+                degrees[3] /= 2
+                degrees[4] /= 2
+            
+            degrees[3] = np.arccos(status[3])*180/np.pi
+            degrees[4] = (np.arccos((status[4]-1)/2))*180/np.pi
+            
+            degrees[0] = 180 - 90*status[0]
+            degrees[1] = 180 - 90*status[1]
+            degrees[2] =  90 + 60*status[2]
+            
+            print(status)
+            print(degrees)
+            print(status_string)
+            #シリアル通信の送信部
+            Serialsend(str(degrees))
         else:
-            cv2.putText(img, 'Put your face in the Window',(0, 50),cv2.FONT_HERSHEY_PLAIN, 2,(255, 0, 0), 5,cv2.LINE_AA)
+            cv2.putText(img, 'Put your face in this frame.',(0, 50),cv2.FONT_HERSHEY_PLAIN, 2,(255, 0, 0), 5,cv2.LINE_AA)
         
-        
-        
-        
-        print(status_string)
-        
-        
-        #シリアル通信の送信部
-        #Serialsend(str(status))
 
         # 結果の表示
         cv2.imshow('readme_img', img)
@@ -215,20 +229,20 @@ def judge(face_parts):
 
     # 目の開閉の判別
     if left_eye_ear > 0.05:
-        eye_l = 1
+        eye_l = 1.0
     else:
-        eye_l = 0
+        eye_l = 0.0
         
     if right_eye_ear > 0.05:
-        eye_r = 1
+        eye_r = 1.0
     else:
-        eye_r = 0
+        eye_r = 0.0
     
     # 口の開閉の判別
     if mouse_size > 0.1:
-        mouse_open = 1
+        mouse_open = 1.0
     else:
-        mouse_open = 0
+        mouse_open = 0.0
     judged =[eye_l, eye_r, mouse_open]
     return judged
 
